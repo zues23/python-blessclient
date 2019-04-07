@@ -11,13 +11,44 @@ steps:
     npm install
     npm install node-lambda -g
   displayName: 'npm install'
+#install dependencies
+- script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/install-dependencies1.sh
+  displayName: 'Install dependencies'
 
-
+#Test the build
 - script: |
       chmod +x .devops/scripts/*.sh
       zubes/.devops/scripts/test2.sh
   displayName: 'Test App'
 
+#Create artifacts
+
+- script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/artifacts3.sh
+  displayName: 'Create Artifacts'
+
+#Copy the serverless config files into the artifacts folder
+- script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/slconfig4.sh
+  displayName: 'Copy the serverless config files into the artifacts folder'
+
+#Build the React App
+- script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/build-reactapp7.sh
+  displayName: 'Build the React App'
+
+
+#Deploy PIT2 API
+
+#Deploy PIT IMPORT
+
+
+#Deploy React App
 - script: |
     node-lambda deploy -a $(AWS_ACCESS_KEY) -s $(AWS_SECRET_KEY) -o $(AWS_ROLE) -r $(AWS_REGION) -n $(AWS_LAMBDA_FUNCTION_NAME) --excludeGlobs "azure-pipelines.yml"
   displayName: 'Deploy to AWS'
