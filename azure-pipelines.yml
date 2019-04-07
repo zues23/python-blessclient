@@ -17,6 +17,10 @@ steps:
     npm install
     npm install node-lambda -g
   displayName: 'npm install'
+- script: |
+    cd install
+    ls -la
+  displayName: 'cd'
 #install dependencies
 - script: |
       chmod +x .devops/scripts/*.sh
