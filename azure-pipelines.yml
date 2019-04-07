@@ -1,99 +1,17 @@
-
-jobs:
-- job: Dependencies 1
-  pool:
-    vmImage: 'ubuntu-16.04'
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '8.x'
-    displayName: 'Install Node.js'
-  - task: Npm@1
-    inputs:
-      command: 'install'
-  - script: |
-      npm run build
-    displayName: 'UI build'
-
-- job: Dependencies 2
-  - script: |
-      chmod +x .devops/scripts/*.sh
-      ./.devops/scripts/install-dependencies1.sh
-    displayName: 'Install dependencies'
-
-#####################################################
-# Run test
-###########################################################
-
-- job: Run Test
-  steps:
-  - script: |
-      chmod +x .devops/scripts/*.sh
-      ./.devops/scripts/test2.sh
-    displayName: 'Test App'
-
-#####################################################
-# Create Artifacts
-###########################################################
-
-- job: Create Artifacts
-  steps:
-  - script: |
-      chmod +x .devops/scripts/*.sh
-      ./.devops/scripts/artifacts3.sh
-    displayName: 'Create Artifacts'
-
-#####################################################
-# Copy severless config files to artifacts folder
-###########################################################
-
-- job: Copy the serverless config
-  steps:
-  - script: |
-      chmod +x .devops/scripts/*.sh
-      ./.devops/scripts/slconfig4.sh
-    displayName: 'Copy the serverless config files into the artifacts folder'
-
-#####################################################
-#Build React App
-###########################################################
-
-- job: Build the React App
-  steps:
-  - script: |
-      chmod +x .devops/scripts/*.sh
-      ./.devops/scripts/build-reactapp7.sh
-    displayName: 'Build the React App'
-
-#####################################################
-#Deploy PIT2 API
-###########################################################
-
-- job: Deploy PIT2 API
-  steps:
-  - script: |
-      chmod +x .devops/scripts/*.sh
-      ./.devops/scripts/deploy-api.sh
-    displayName: 'Deploy pit2-api'
-
-#####################################################
-#Deploy PIT2 IMPORT
-###########################################################
-
-- job: Deploy PIT IMPORT
-  steps:
-  - script: |
-      chmod +x .devops/scripts/*.sh
-      ./.devops/scripts/deploy-import.sh
-    displayName: 'Deploy pit2-import'
-
-#####################################################
-#Deploy React App
-###########################################################
-
-- job: Deploy React App
-  steps:
-  - script: |
-      chmod +x .devops/scripts/*.sh
-      ./.devops/scripts/deploy-reactapp7.sh
-    displayName: 'Deploy React App'
+pool:
+  vmImage: 'Ubuntu 16.04'
+ 
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '8.x'
+  displayName: 'Install Node.js'
+ 
+- script: |
+    npm install
+    npm install node-lambda -g
+  displayName: 'npm install'
+ 
+- script: |
+    node-lambda deploy -a $(AWS_ACCESS_KEY) -s $(AWS_SECRET_KEY) -o $(AWS_ROLE) -r $(AWS_REGION) -n $(AWS_LAMBDA_FUNCTION_NAME) --excludeGlobs "azure-pipelines.yml"
+  displayName: 'Deploy to AWS'
