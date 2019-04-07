@@ -12,8 +12,8 @@ steps:
     npm install node-lambda -g
   displayName: 'npm install'
 
-- steps:
-  - script: |
+
+- script: |
       chmod +x .devops/scripts/*.sh
       zubes/.devops/scripts/test2.sh
     displayName: 'Test App'
