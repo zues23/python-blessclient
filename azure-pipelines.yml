@@ -6,7 +6,13 @@ steps:
   inputs:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
- 
+
+# install AWS CLI
+- script: |
+      python -m pip install --upgrade pip==9.0.3 setuptools wheel
+      pip install awscli --user
+  displayName: 'Install tools'
+
 - script: |
     npm install
     npm install node-lambda -g
