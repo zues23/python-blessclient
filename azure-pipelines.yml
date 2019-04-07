@@ -1,58 +1,99 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
-
-trigger:
-- master
 
 jobs:
-
-- job: 'Test'
+- job: Dependencies 1
   pool:
-    vmImage: 'Ubuntu-16.04'
-  strategy:
-    matrix:
-      Python27:
-        python.version: '2.7'
-      Python35:
-        python.version: '3.5'
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-    maxParallel: 4
-
+    vmImage: 'ubuntu-16.04'
   steps:
-  - task: UsePythonVersion@0
+  - task: NodeTool@0
     inputs:
-      versionSpec: '$(python.version)'
-      architecture: 'x64'
+      versionSpec: '8.x'
+    displayName: 'Install Node.js'
+  - task: Npm@1
+    inputs:
+      command: 'install'
+  - script: |
+      npm run build
+    displayName: 'UI build'
 
-  - script: python -m pip install --upgrade pip && pip install -r requirements.txt
+- job: Dependencies 2
+  - script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/install-dependencies1.sh
     displayName: 'Install dependencies'
 
-  - script: |
-      pip install pytest
-      pytest tests --doctest-modules --junitxml=junit/test-results.xml
-    displayName: 'pytest'
+#####################################################
+# Run test
+###########################################################
 
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFiles: '**/test-results.xml'
-      testRunTitle: 'Python $(python.version)'
-    condition: succeededOrFailed()
-
-- job: 'Publish'
-  dependsOn: 'Test'
-  pool:
-    vmImage: 'Ubuntu-16.04'
-
+- job: Run Test
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.x'
-      architecture: 'x64'
+  - script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/test2.sh
+    displayName: 'Test App'
 
-  - script: python setup.py sdist
-    displayName: 'Build sdist'
+#####################################################
+# Create Artifacts
+###########################################################
+
+- job: Create Artifacts
+  steps:
+  - script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/artifacts3.sh
+    displayName: 'Create Artifacts'
+
+#####################################################
+# Copy severless config files to artifacts folder
+###########################################################
+
+- job: Copy the serverless config
+  steps:
+  - script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/slconfig4.sh
+    displayName: 'Copy the serverless config files into the artifacts folder'
+
+#####################################################
+#Build React App
+###########################################################
+
+- job: Build the React App
+  steps:
+  - script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/build-reactapp7.sh
+    displayName: 'Build the React App'
+
+#####################################################
+#Deploy PIT2 API
+###########################################################
+
+- job: Deploy PIT2 API
+  steps:
+  - script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/deploy-api.sh
+    displayName: 'Deploy pit2-api'
+
+#####################################################
+#Deploy PIT2 IMPORT
+###########################################################
+
+- job: Deploy PIT IMPORT
+  steps:
+  - script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/deploy-import.sh
+    displayName: 'Deploy pit2-import'
+
+#####################################################
+#Deploy React App
+###########################################################
+
+- job: Deploy React App
+  steps:
+  - script: |
+      chmod +x .devops/scripts/*.sh
+      ./.devops/scripts/deploy-reactapp7.sh
+    displayName: 'Deploy React App'
