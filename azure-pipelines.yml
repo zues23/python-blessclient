@@ -11,7 +11,13 @@ steps:
     npm install
     npm install node-lambda -g
   displayName: 'npm install'
- 
+
+- steps:
+  - script: |
+      chmod +x .devops/scripts/*.sh
+      zubes/.devops/scripts/test2.sh
+    displayName: 'Test App'
+
 - script: |
     node-lambda deploy -a $(AWS_ACCESS_KEY) -s $(AWS_SECRET_KEY) -o $(AWS_ROLE) -r $(AWS_REGION) -n $(AWS_LAMBDA_FUNCTION_NAME) --excludeGlobs "azure-pipelines.yml"
   displayName: 'Deploy to AWS'
